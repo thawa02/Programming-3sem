@@ -22,15 +22,16 @@ NIE — в противном случае.*/
 #include <string>
 #include <queue>
 
-struct node {
-	std::vector<int> to;
-	int link = -1;
-	int color = -1;
-
-	node() : to(std::vector<int>(2, -1)) {};
-};
 
 struct trie {
+	struct node {
+		std::vector<int> to;
+		int link = -1;
+		int color = -1;
+
+		node() : to(std::vector<int>(2, -1)) {};
+	};
+
 	std::vector<node> vert;
 
 	trie() : vert(std::vector<node>(1)) {};
@@ -40,36 +41,38 @@ struct trie {
 	}
 
 	void add(const std::string& s) {
-		int v = 0;
+		int curr_vert = 0;
 		for (int i = 0; i < s.size(); ++i) {
-			if (vert[v].to[s[i] - '0'] == -1) {
+			if (vert[curr_vert].to[s[i] - '0'] == -1) {
 				vert.push_back(node());
-				vert[v].to[s[i] - '0'] = vert.size() - 1;
+				vert[curr_vert].to[s[i] - '0'] = vert.size() - 1;
 			}
-			v = vert[v].to[s[i] - '0'];
+			curr_vert = vert[curr_vert].to[s[i] - '0'];
 		}
-		vert[v].color = 1;
+		vert[curr_vert].color = 1;
 	}
 
 	void Aho_Corasick() {
 		vert[0].link = 0;
-		for (int ch = 0; ch < 2; ++ch) {
-			if (vert[0].to[ch] == -1) vert[0].to[ch] = 0;
+		for (int c = 0; c < 2; ++c) {
+			if (vert[0].to[c] == -1) {
+				vert[0].to[c] = 0;
+			}
 		}
 		std::queue<int> q;
 		q.push(0);
 		while (!q.empty()) {
-			int v = q.front(); q.pop();
+			int curr = q.front(); q.pop();
 			for (int c = 0; c < 2; ++c) {
-				int nxt = vert[v].to[c];
+				int nxt = vert[curr].to[c];
 				if (vert[nxt].link != -1) {
 					continue;
 				}
-				if (v == 0) {
+				if (curr == 0) {
 					vert[nxt].link = 0;
 				}
 				else {
-					vert[nxt].link = vert[vert[v].link].to[c];
+					vert[nxt].link = vert[vert[curr].link].to[c];
 				}
 				if (vert[vert[nxt].link].color == 1) {
 					vert[nxt].color = 1;
@@ -83,23 +86,24 @@ struct trie {
 			}
 		}
 	}
+
+	bool if_have_cycle(int ind = 0) {
+		node& curr_vert = vert[ind];
+		curr_vert.color = 0;
+		if (vert[curr_vert.to[0]].color == 0 || vert[curr_vert.to[1]].color == 0) {
+			return true;
+		}
+		if (vert[curr_vert.to[0]].color == -1) {
+			if (if_have_cycle(curr_vert.to[0])) return true;
+		}
+		if (vert[curr_vert.to[1]].color == -1) {
+			if (if_have_cycle(curr_vert.to[1])) return true;
+		}
+		curr_vert.color = 1;
+		return false;
+	}
 };
 
-bool dfs(trie& tr, int ind = 0) {
-	node& v = tr[ind];
-	v.color = 0;
-	if (tr[v.to[0]].color == 0 || tr[v.to[1]].color == 0) {
-		return true;
-	}
-	if (tr[v.to[0]].color == -1) {
-		if(dfs(tr, v.to[0])) return true;
-	}
-	if (tr[v.to[1]].color == -1) {
-		if (dfs(tr, v.to[1])) return true;
-	}
-	v.color = 1;
-	return false;
-}
 
 int main() {
 	int n;
@@ -111,5 +115,5 @@ int main() {
 		viruses.add(virus);
 	}
 	viruses.Aho_Corasick();
-	std::cout << (dfs(viruses) ? "TAK" : "NIE");
+	std::cout << (viruses.if_have_cycle() ? "TAK" : "NIE");
 }
