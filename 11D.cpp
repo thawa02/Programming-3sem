@@ -23,14 +23,14 @@
 #include <map>
 #include <vector>
 
-struct node {
-	std::map<char, int> to;
-	int term = 0;
-};
 
-
-struct trie {
+class trie {
 private:
+	struct node {
+		std::map<char, int> to;
+		int term = 0;
+	};
+
 	std::vector<node> words;
 	std::vector<int> dots;
 
@@ -51,21 +51,21 @@ private:
 public:
 	trie(const std::string& s) :
 		words(std::vector<node>(1)), dots(std::vector<int>(1)) {
-		int v = 0;
+		int vert = 0;
 		for (int i = 0; i < s.size(); ++i) {
 			if (s[i] == '.') {
 				++dots[dots.size() - 1];
 				continue;
 			}
-			if (!words[v].to.count(s[i])) {
+			if (!words[vert].to.count(s[i])) {
 				words.push_back(node());
-				words[v].to[s[i]] = words.size() - 1;
+				words[vert].to[s[i]] = words.size() - 1;
 			}
-			v = words[v].to[s[i]];
+			vert = words[vert].to[s[i]];
 			if (i == s.size() - 1 || s[i + 1] == '.') {
 				dots.push_back(0);
-				++words[v].term;
-				v = 0;
+				++words[vert].term;
+				vert = 0;
 			}
 		}
 	}
