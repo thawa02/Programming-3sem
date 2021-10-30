@@ -23,7 +23,7 @@ NIE — в противном случае.*/
 #include <queue>
 
 
-struct trie {
+class trie {
 	struct node {
 		std::vector<int> to;
 		int link = -1;
