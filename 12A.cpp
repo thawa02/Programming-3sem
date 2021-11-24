@@ -1,11 +1,25 @@
+/*A. Суффиксный массив
+ограничение по времени на тест2 секунды
+ограничение по памяти на тест256 мегабайт
+вводстандартный ввод
+выводстандартный вывод
+Постройте суффиксный массив для заданной строки s.
+
+Входные данные
+Первая строка входного файла содержит строку s (1≤|s|≤400000). Строка состоит из строчных латинских букв.
+
+Выходные данные
+Выведите |s| различных чисел — номера первых символов суффиксов строки s так, чтобы соответствующие суффиксы 
+были упорядочены в лексикографически возрастающем порядке.*/
+
 #include <iostream>
 #include <string>
 #include <vector>
 
 struct sufmas {
 private:
-	const int symb = 59;
-	const int first_symb = 64;
+	const int symb = 27;
+	const int first_symb = 96;
 	std::vector<int> clss;
 
 	void CountFirstStep() {
@@ -97,11 +111,12 @@ public:
 	std::vector<int> pref;
 	std::vector<int> lcp;
 
-	sufmas(const std::string& str): str(str), clss(std::vector<int>(str.size())), 
-		pref(std::vector<int>(str.size())), lcp(std::vector<int>(str.size())) {
+	sufmas(const std::string& str): str(str + char(first_symb)), 
+			clss(std::vector<int>(str.size() + 1)), 
+			pref(std::vector<int>(str.size() + 1)), 
+			lcp(std::vector<int>(str.size() + 1)) {
 		CountFirstStep();
 		int classes = CalcClssFirst();
-
 		for (int i = 0; (1 << i) < str.size(); ++i) {
 			CountNextStep(classes, i);
 			classes = CalcClssNext(i);
@@ -111,23 +126,9 @@ public:
 
 int main() {
 	std::string str;
-	long long num;
-	std::cin >> str >> num;
-	str += char(64);
-	sufmas ms(str);
-	int ind = 1;
-	while (ind < str.size() - 1 && 
-		num > int(str.size()) - ms.pref[ind] - 1 - ms.lcp[ind - 1]) {
-		num -= int(str.size()) - ms.pref[ind] - 1 - ms.lcp[ind - 1];
-		++ind;
-	}
-	if (num > int(str.size()) - ms.pref[ind] - 1 - ms.lcp[ind - 1]) {
-		for (int i = ms.pref[ind]; i < str.size() - 1; ++i) {
-			std::cout << str[i];
-		}
-		return 0;
-	}
-	for (int i = ms.pref[ind]; i < ms.pref[ind] + ms.lcp[ind - 1] + num; ++i) {
-		std::cout << str[i];
+	std::cin >> str;
+	sufmas sm(str);
+	for (int i = 1; i <= str.size(); ++i) {
+		std::cout << sm.pref[i] + 1 << ' ';
 	}
 }
