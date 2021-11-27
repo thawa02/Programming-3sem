@@ -27,13 +27,17 @@ A <текст> (<текст> — это набор не более 105 лати�
 
 class sufavtomat {
 private:
+	static const int symb = 26;
+	static const int first_symb = 97;
+	static const int first_great_symb = 65;
+
 	struct Node {
 		std::vector<int> to;
 		int link = -1;
 		int len = 0;
 		bool term = false;
 
-		Node() : to(std::vector<int>(26, -1)) {};
+		Node() : to(std::vector<int>(symb, -1)) {};
 		Node(const Node& other) = default;
 	};
 
@@ -41,7 +45,7 @@ private:
 	int last = 0;
 
 	void AddChar(char c) {
-		int next = (int(c) < 97 ? int(c) - 65 : int(c) - 97);
+		int next = (int(c) < first_symb ? int(c) - first_great_symb : int(c) - first_symb);
 		vert.push_back(Node());
 		int new_vert = vert.size() - 1;
 		int prev = last;
