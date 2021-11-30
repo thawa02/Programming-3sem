@@ -87,7 +87,7 @@ public:
 	bool if_substr(std::string pattern) {
 		int curr = 0;
 		for (auto c : pattern) {
-			int next = (int(c) < 97 ? int(c) - 65 : int(c) - 97);
+			int next = (int(c) < first_symb ? int(c) - first_great_symb : int(c) - first_symb);
 			if (vert[curr].to[next] == -1) {
 				return false;
 			}
