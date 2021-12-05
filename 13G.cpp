@@ -1,0 +1,68 @@
+#define _USE_MATH_DEFINES
+
+#include <iostream>
+#include <complex>
+#include <vector>
+#include <cmath>
+
+using base = std::complex<double>;
+
+void fft(std::vector<base>& coef, bool inverse) {
+	int sz = coef.size();
+	if (sz == 1) {
+		return;
+	}
+	std::vector<base> coef0(sz / 2), coef1(sz / 2);
+	for (int i = 0; i < sz; i += 2) {
+		coef0[i/2] = coef[i];
+		coef1[i/2] = coef[i + 1];
+	}
+	fft(coef0, inverse);
+	fft(coef1, inverse);
+	double angle = M_PI * 2 / sz * (inverse ? -1 : 1);
+	base curr(1), prime_root(cos(angle), sin(angle));
+	for (int i = 0; i < sz / 2; ++i) {
+		coef[i] = coef0[i] + curr * coef1[i];
+		coef[i + sz / 2] = coef0[i] - curr * coef1[i];
+		curr *= prime_root;
+		if (inverse) {
+			coef[i] /= 2;
+			coef[i + sz / 2] /= 2;
+		}
+	}
+}
+
+std::vector<base> multiply(std::vector<base> p, std::vector<base> q) {
+	int deg = 0;
+	while ((1 << deg) < p.size() + q.size()) {
+		++deg;
+	}
+	p.resize(1 << deg, 0);
+	q.resize(1 << deg, 0);
+	fft(p, 0);
+	fft(q, 0);
+	for (int i = 0; i < (1 << deg); ++i) {
+		p[i] *= q[i];
+	}
+	fft(p, 1);
+	return p;
+}
+
+int main() {
+	int n, m;
+	std::cin >> n;
+	std::vector<base> p(n + 1);
+	for (int i = n; i >= 0; --i) {
+		std::cin >> p[i];
+	}
+	std::cin >> m;
+	std::vector<base> q(m + 1);
+	for (int i = m; i >= 0; --i) {
+		std::cin >> q[i];
+	}
+	auto product = multiply(p, q);
+	std::cout << n + m << ' ';
+	for (int i = n + m; i >= 0; --i) {
+		std::cout << int(llround(product[i].real())) << ' ';
+	}
+}
