@@ -14,24 +14,33 @@
 #include <iostream>
 #include <vector>
 
-int main() {
-	int n;
-	std::cin >> n;
-	std::vector<int> mindiv(n + 1), primes;
-	for (int i = 1; i <= n; ++i) {
+std::vector<int> count_mindiv(int last) {
+	std::vector<int> mindiv(last + 1), primes;
+	for (int i = 1; i <= last; ++i) {
 		mindiv[i] = i;
 	}
-	long long ans = 0;
-	for (int curr = 2; curr <= n; ++curr) {
+	for (int curr = 2; curr <= last; ++curr) {
 		if (mindiv[curr] == curr) {
 			primes.push_back(curr);
 		}
 		for (int p : primes) {
-			if (p * curr > n || p > mindiv[curr]) {
+			if (p * curr > last || p > mindiv[curr]) {
 				break;
 			}
-			ans += p;
 			mindiv[p * curr] = p;
+		}
+	}
+	return mindiv;
+}
+
+int main() {
+	int n;
+	std::cin >> n;
+	auto mindiv = count_mindiv(n);
+	long long ans = 0;
+	for (int i = 2; i <= n; ++i) {
+		if (mindiv[i] != i) {
+			ans += mindiv[i];
 		}
 	}
 	std::cout << ans;
