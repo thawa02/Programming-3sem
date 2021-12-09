@@ -40,15 +40,28 @@ std::vector<long long> reverse(int n, long long mod) {
 	return ans;
 }
 
+long long count_sum_of_weights(int sz, int num) {
+	auto rev = reverse(num, mod);
+	std::vector<long long> rev_fact(num + 1);
+	rev_fact[0] = 1;
+	for (int i = 1; i <= num; ++i) {
+		rev_fact[i] = (rev_fact[i - 1] * rev[i]) % mod;
+	}
+	long long ans = 0;
+	//S_{n, k} + (n - 1) * S_{n - 1, k} = \sum\limits_{j = 1}{k} (-1)^{k + j} * j^{n - 1} * (j + n - 1) /j!(k - j)!
+	for (int j = 0; j <= num; ++j) {
+		int exp = (binpow(j, sz - 1) * (j + sz - 1)) % mod;
+		long long term = (rev_fact[j] * rev_fact[num - j]) % mod;
+		term *= exp;
+		ans += ((num + j) % 2 == 0 ? 1 : -1) * term;
+		ans %= mod;
+	}
+	return ans;
+}
+
 int main() {
 	int n, k;
 	std::cin >> n >> k;
-	auto rev = reverse(k, mod);
-	std::vector<long long> rev_fact(k + 1);
-	rev_fact[0] = 1;
-	for (int i = 1; i <= k; ++i) {
-		rev_fact[i] = (rev_fact[i - 1] * rev[i]) % mod;
-	}
 	long long sum = 0;
 	for (int i = 0; i < n; ++i) {
 		int curr;
@@ -60,16 +73,7 @@ int main() {
 		std::cout << sum;
 		return 0;
 	}
-	long long ans = 0;
-	//S_{n, k} + (n - 1) * S_{n - 1, k} = \Sigma_{j = 1}^k (-1)^{k + j} * j^{n - 1} * (j + n - 1) /j!(k - j)!
-	for (int j = 0; j <= k; ++j) {
-		int exp = (binpow(j, n - 1) * (j + n - 1)) % mod;
-		long long term = (rev_fact[j] * rev_fact[k - j]) % mod;
-		term *= exp;
-		ans += ((k + j) % 2 == 0 ? 1 : -1) * term;
-		ans %= mod;
-	}
-	ans %= mod;
+	long long ans = count_sum_of_weights(n, k);
 	ans *= sum;
 	ans %= mod;
 	std::cout << ans;
