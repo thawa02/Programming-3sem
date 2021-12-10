@@ -120,6 +120,12 @@ bool ConvexPolygon::containsPoint(Point point) const {
 }
 
 ConvexPolygon operator+(const ConvexPolygon& a, const ConvexPolygon& b) {
+	if (a.size() == 0) {
+		return b;
+	}
+	if (b.size() == 0) {
+		return a;
+	}
 	ConvexPolygon ans;
 	int inda = 1, indb = 1;
 	ans.vert.push_back(a[0] + b[0]);
@@ -130,7 +136,8 @@ ConvexPolygon operator+(const ConvexPolygon& a, const ConvexPolygon& b) {
 			if (inda < a.size() || indb < b.size()) {
 				ans.vert.push_back(u + v);
 			}
-			++inda; ++indb;
+			++inda; 
+			++indb;
 			continue;
 		}
 		if (cross(u, v) > 0) {
@@ -155,26 +162,16 @@ ConvexPolygon operator+(const ConvexPolygon& a, const ConvexPolygon& b) {
 }
 
 int main() {
-	int n;
-	std::cin >> n;
-	std::vector<Point> vert(n);
-	for (int i = 0; i < n; ++i) {
-		std::cin >> vert[i];
+	ConvexPolygon fin;
+	for (int k = 0; k < 3; ++k) {
+		int n;
+		std::cin >> n;
+		std::vector<Point> vert(n);
+		for (int i = 0; i < n; ++i) {
+			std::cin >> vert[i];
+		}
+		fin = fin + ConvexPolygon(vert);
 	}
-	ConvexPolygon a(vert);
-	std::cin >> n;
-	vert.resize(n);
-	for (int i = 0; i < n; ++i) {
-		std::cin >> vert[i];
-	}
-	ConvexPolygon b(vert);
-	std::cin >> n;
-	vert.resize(n);
-	for (int i = 0; i < n; ++i) {
-		std::cin >> vert[i];
-	}
-	ConvexPolygon c(vert);
-	ConvexPolygon fin = a + b + c;
 	int q;
 	std::cin >> q;
 	for (int i = 0; i < q; ++i) {
