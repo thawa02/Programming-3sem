@@ -51,33 +51,47 @@ private:
 	std::vector<Point> vertices;
 public:
 	Polygon() = default;
-	Polygon(const std::vector<Point>& vertices) : vertices(vertices) {};
+	Polygon(size_t sz) : vertices(std::vector<Point>(sz)) {};
 
 	size_t size() const {
 		return vertices.size();
 	}
+
+	Point& operator[](size_t ind) {
+		return vertices[ind];
+	}
+	Point operator[](size_t ind) const {
+		return vertices[ind];
+	}
+
 	bool containsPoint(Point point) const;
 };
 
 bool Polygon::containsPoint(Point point) const {
 	double sum_of_angles = 0.0;
 	for (size_t i = 0; i < size(); ++i) {
-		Point u = point - vertices[i], v = point - vertices[(i + 1) % size()];
-		if (cross(u, v) == 0 && dot(u, v) <= 0) return true;
+		Point u = point - vertices[i];
+		Point v = point - vertices[(i + 1) % size()];
+		if (cross(u, v) == 0 && dot(u, v) <= 0) {
+			return true;
+		}
 		sum_of_angles += atan2(cross(u, v), dot(u, v));
 	}
-	if (fabs(sum_of_angles) > 3.1415) return true;
-	else return false;
+	if (fabs(sum_of_angles) > 3.1415) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 int main() {
 	int n;
 	Point p;
 	std::cin >> n >> p;
-	std::vector<Point> vert(n);
+	Polygon m(n);
 	for (int i = 0; i < n; ++i) {
-		std::cin >> vert[i];
+		std::cin >> m[i];
 	}
-	Polygon m(vert);
 	std::cout << (m.containsPoint(p) ? "YES" : "NO");
 }
