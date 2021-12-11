@@ -74,7 +74,7 @@ private:
 	friend ConvexPolygon operator+(const ConvexPolygon&, const ConvexPolygon&);
 public:
 	ConvexPolygon() = default;
-	ConvexPolygon(const std::vector<Point>& vertices) : vert(std::vector<Point>(vertices.size())) {
+	ConvexPolygon(const std::vector<Point>& vertices) : vert(vertices.size()) {
 		int ind = 0;
 		for (int i = 1; i < size(); ++i) {
 			if (vertices[i] < vertices[ind]) {
